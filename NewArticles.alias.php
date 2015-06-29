@@ -1,6 +1,6 @@
 <?php
 /**
- * Aliases for myextension
+ * Aliases for SpecialNewArticles
  *
  * @file
  * @ingroup Extensions
@@ -18,6 +18,6 @@ $specialPageAliases['en'] = array(
 /** Hebrew
  * @author Dror S. [FFS]
  */
-$specialPageAliases['de'] = array(
+$specialPageAliases['he'] = array(
 	'NewArticles' => array( 'ערכים חדשים', 'ערכים חדשים בכל-זכות' ),
 );
