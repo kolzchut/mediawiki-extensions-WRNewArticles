@@ -19,5 +19,5 @@ $specialPageAliases['en'] = array(
  * @author Dror S. [FFS]
  */
 $specialPageAliases['he'] = array(
-	'NewArticles' => array( 'ערכים חדשים', 'ערכים חדשים בכל-זכות' ),
+	'NewArticles' => array( 'ערכים חדשים' ),
 );
