@@ -16,6 +16,7 @@ $wgExtensionCredits['special'][] = array(
 	),
 	'version'  => '0.1.0a',
 	'license-name' => 'GPL-2.0+',
+	'url' => 'https://github.com/kolzchut/mediawiki-extensions-WRNewArticles',
 	'descriptionmsg' => 'newarticles-desc',
 	'path' => __FILE__
 );
