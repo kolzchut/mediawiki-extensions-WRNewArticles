@@ -14,7 +14,7 @@ $wgExtensionCredits['special'][] = array(
 	'author' => array(
 		'Dror S. [FFS] ([http://www.kolzchut.org.il Kol-Zchut])',
 	),
-	'version'  => '0.1.0a',
+	'version'  => '0.1.1',
 	'license-name' => 'GPL-2.0+',
 	'url' => 'https://github.com/kolzchut/mediawiki-extensions-WRNewArticles',
 	'descriptionmsg' => 'newarticles-desc',

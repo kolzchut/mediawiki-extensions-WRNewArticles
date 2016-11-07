@@ -6,4 +6,8 @@ pages moved from NS_WR_DRAFTS to NS_MAIN.
 
 ## Changelog ##
 
+### 0.1.1, 2016-07-10 ###
+Portals shown in **bold** and marked as such, to make new portals stand
+out more. This makes use of the WikiRights ArticleType extension.
+
 ### 0.1.0a, 2015-06-23 ###

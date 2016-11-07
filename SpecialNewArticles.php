@@ -18,14 +18,9 @@ class SpecialNewArticles extends SpecialPage {
 	}
 
 	function execute( $query ) {
-		$request = $this->getRequest();
-		$output = $this->getOutput();
-
 		$this->setHeaders();
 
 		$pager = new NewArticlesPager();
-
-		//log_namespace =
 
 		# Insert list
 		$logBody = $pager->getBody();
@@ -57,20 +52,45 @@ class NewArticlesPager extends LogPager {
 			0
 		);
 		$extraConds = array(
-			'log_namespace = ' . NS_WR_DRAFTS
+			'log_namespace' => NS_WR_DRAFTS
 		);
 
 		parent::__construct(
 			$loglist,
 			array( 'move' ),
-			null, null, null,
+			'', '', '',
 			$extraConds
 		);
 
-
 	}
 
+	public function getQueryInfo() {
+		$info = parent::getQueryInfo();
+		$info['tables'][] = 'page_props';
+		$info['join_conds']['page_props'] = array( 'LEFT JOIN', array(
+			'pp_page=log_page',
+			'pp_propname = "ArticleType"'
+		) );
+
+
+		$info['fields'][] = 'pp_value';
+
+		return $info;
+	}
+
+
+	/**
+	 * @param array|stdClass $row
+	 *
+	 * @return bool|string
+	 */
 	function formatRow( $row ) {
+
+		// Make sure the target is NS_MAIN, otherwise we're not interested
+		if ( (int)$row->log_namespace !== NS_MAIN ) {
+			return false;
+		}
+
 		$time = htmlspecialchars(
 			$this->getLanguage()->userDate(
 				$row->log_timestamp,
@@ -78,21 +98,41 @@ class NewArticlesPager extends LogPager {
 			)
 		);
 
-		$params = unserialize( $row->log_params );
-		//print_r( $params ); echo "\n";
-		$newName = $params['4::target'];
-		$pageTitle = Title::newFromText( $newName );
-
-		// Make sure the target is NS_MAIN
-		if ( $pageTitle->getNamespace() !== NS_MAIN ) {
-			return false;
+		$paramsSerialized = unserialize( $row->log_params );
+		$paramsOldFormat = null;
+		// If the params aren't serialized, it's an older log format
+		if ( $paramsSerialized === false ) {
+			$paramsOldFormat = explode( "\n", $row->log_params );
 		}
 
-		$pageLink = Linker::linkKnown( $pageTitle );
+		$newMoveName = $paramsSerialized === false ? $paramsOldFormat[0] : $paramsSerialized['4::target'];
+		$currentTitle = $row->log_page ? Title::newFromID( $row->log_page ) : null;
+
+		$pageTitle = Title::newFromText( $newMoveName );
+
+
+
+		$pageLink = Linker::link( $pageTitle );
+		$articleTypeDisplay = '';
+
+		if ( $row->pp_value === 'portal' ) {
+			$pageLink = Html::rawElement( 'strong', array(), $pageLink );
+
+			$articleTypeReadable = WRArticleType::getReadableArticleTypeFromCode( $row->pp_value );
+			$articleTypeDisplay = $this->msg( 'newarticles-articletype' )->params( $articleTypeReadable )->text();
+			$articleTypeDisplay = ' ' . $articleTypeDisplay . ' ';
+		}
+
+		$originalNameDisplay = '';
+		if ( $newMoveName !== $currentTitle->getFullText() ) {
+			$originalNameDisplay = $newMoveName;
+		}
+
+
 		$formattedRow = Html::rawElement(
 			'li',
 			array(),
-			"$time: $pageLink"
+			"{$time}: {$pageLink}{$articleTypeDisplay}{$originalNameDisplay}"
 		) . "\n";
 
 		return $formattedRow;
