@@ -63,20 +63,12 @@ class NewArticlesPager extends LogPager {
 
 	public function getQueryInfo() {
 		$info = parent::getQueryInfo();
-		$info[ 'fields' ][] = 'log_page';
 
 		// if Extension:WRArticleType is available
-		if ( class_exists( 'WRArticleType' ) ) {
-			$info[ 'tables' ][] = 'page_props';
-			$info[ 'join_conds' ][ 'page_props' ] = [
-				'LEFT JOIN',
-				[
-					'pp_page=log_page',
-					'pp_propname = "ArticleType"'
-				]
-			];
+		if ( ExtensionRegistry::getInstance()->isLoaded ( 'ArticleType' ) ) {
+			$articleTypeQuery = \MediaWiki\Extension\ArticleType\ArticleType::getJoin( null, 'log_page' );
 
-			$info[ 'fields' ][] = 'pp_value';
+			$info = array_merge_recursive( $info, $articleTypeQuery );
 		}
 
 		return $info;
@@ -113,19 +105,17 @@ class NewArticlesPager extends LogPager {
 			$originalNameDisplay = ' ' . $this->msg( 'newarticles-original-title' )->params( $targetName );
 		}
 
-		$pageLink = Linker::link( $originalNameDisplay ? $currentTitle : $targetTitleObj );
+		$pageLink = $this->getLinkRenderer()->makeLink( $originalNameDisplay ? $currentTitle : $targetTitleObj );
 		$articleTypeDisplay = '';
 
-		if ( isset( $row->pp_value ) && $row->pp_value === 'portal' ) {
+		if ( isset( $row->article_type ) && $row->article_type === 'portal' ) {
 			$pageLink = Html::rawElement( 'strong', [], $pageLink );
-
-			$articleTypeReadable = WRArticleType::getReadableArticleTypeFromCode( $row->pp_value );
-			$articleTypeDisplay = $this->msg( 'newarticles-articletype' )
-									->params( $articleTypeReadable )->text();
-			$articleTypeDisplay = ' ' . $articleTypeDisplay;
 		}
 
-
+		$articleTypeReadable = WRArticleType::getReadableArticleTypeFromCode( $row->article_type );
+		$articleTypeDisplay = $this->msg( 'newarticles-articletype' )
+								->params( $articleTypeReadable )->text();
+		$articleTypeDisplay = ' ' . $articleTypeDisplay;
 
 		$formattedRow = Html::rawElement(
 			'li',

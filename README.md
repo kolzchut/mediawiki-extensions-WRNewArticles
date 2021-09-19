@@ -21,3 +21,20 @@ NS_MAIN.
 
 ### 0.1.0a, 2015-06-23
 First version ever.
+
+
+### Debugging
+For debugging purposes, this is *almost* the SQL equivalent to the log's query:
+```sql
+SELECT * FROM logging
+WHERE
+	log_type = 'move'
+    AND log_namespace = '116'
+    AND log_params REGEXP '"4::target";s:[0-9]+:"([^:"]*)"'
+    AND log_timestamp > '20200601000000' AND log_timestamp < '20200701000000'    
+ORDER BY log_timestamp DESC
+```
+
+Please note:
+- 116 = NS_WR_DRAFTS
+- The log_params regex makes sure pages were only moved to NS_MAIN (no colon in the title)
