@@ -1,26 +1,27 @@
 <?php
 
+use MediaWiki\Extension\ArticleContentArea\ArticleContentArea;
+
 /**
  * Special page to display list of pages moved from NS_DRAFT to NS_MAIN
  *
  */
-class SpecialNewArticles extends SpecialPage {
-
+class SpecialNewArticles extends FormSpecialPage {
 	/**
 	 * Constructor
 	 */
-	function __construct() {
-		parent::__construct( 'NewArticles' );
+	function __construct( $name = 'NewArticles' ) {
+		parent::__construct( $name );
 	}
 
 	protected function getGroupName() {
 		return 'changes';
 	}
 
-	function execute( $query ) {
-		$this->setHeaders();
+	public function onSubmit( array $data ) {
+		$contentarea = $this->getRequest()->getVal( 'contentarea' );
 
-		$pager = new NewArticlesPager();
+		$pager = new NewArticlesPager( $contentarea );
 
 		# Insert list
 		$logBody = $pager->getBody();
@@ -33,7 +34,48 @@ class SpecialNewArticles extends SpecialPage {
 		} else {
 			$this->getOutput()->addWikiMsg( 'logempty' );
 		}
+	}
 
+	protected function alterForm( HTMLForm $form ) {
+		$form->setMethod( 'get' );
+	}
+
+	protected function getFormFields() {
+		$fields = [];
+		if ( ExtensionRegistry::getInstance()->isLoaded( 'ArticleContentArea' ) ) {
+			$fields['contentarea'] = [
+				'type'          => 'select',
+				'name'          => 'contentarea',
+				'label-message' => 'newarticles-filter-contentarea',
+				'options'       => self::getContentAreaOptions(),
+			];
+		}
+
+		return $fields;
+	}
+
+	private static function makeOptionsForSelect( $arr ) {
+		$arr = array_filter( $arr ); // Remove empty elements
+		$arr = array_combine( $arr, $arr );
+
+		return $arr;
+	}
+
+	private static function makeOptionsWithAllForSelect( $arr ) {
+		$arr = [ 'הכל' => '' ] + self::makeOptionsForSelect( $arr ); // @todo i18n
+
+		return $arr;
+	}
+
+	private static function getContentAreaOptions() {
+		return self::makeOptionsWithAllForSelect( ArticleContentArea::getValidContentAreas() );
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	protected function getDisplayFormat() {
+		return 'ooui';
 	}
 
 }
@@ -42,7 +84,9 @@ class SpecialNewArticles extends SpecialPage {
  * @ingroup SpecialPage Pager
  */
 class NewArticlesPager extends LogPager {
-	function __construct() {
+	protected $contentArea;
+
+	function __construct( $contentArea = null ) {
 		$loglist = new LogEventsList(
 			$this->getContext(),
 			null,
@@ -51,6 +95,8 @@ class NewArticlesPager extends LogPager {
 		$extraConds = [
 			'log_namespace' => NS_WR_DRAFTS
 		];
+
+		$this->contentArea = $contentArea;
 
 		parent::__construct(
 			$loglist,
@@ -63,6 +109,11 @@ class NewArticlesPager extends LogPager {
 
 	public function getQueryInfo() {
 		$info = parent::getQueryInfo();
+
+		if ( ExtensionRegistry::getInstance()->isLoaded ( 'ArticleContentArea' ) ) {
+			$contentAreaQuery = \MediaWiki\Extension\ArticleContentArea\ArticleContentArea::getJoin( $this->contentArea, 'log_page' );
+			$info = array_merge_recursive( $info, $contentAreaQuery );
+		}
 
 		// if Extension:WRArticleType is available
 		if ( ExtensionRegistry::getInstance()->isLoaded ( 'ArticleType' ) ) {

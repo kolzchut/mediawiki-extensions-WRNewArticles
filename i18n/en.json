@@ -7,5 +7,6 @@
 	"newarticles-desc": "Adds a special page that shows new articles as defined for the Kol-Zchut website: pages moved from NS_DRAFT to NS_MAIN.",
 	"newarticles": "ערכים חדשים ב\"כל זכות\"",
 	"newarticles-articletype": "($1)",
-	"newarticles-original-title": "[כותרת מקורית: $1]"
+	"newarticles-original-title": "[כותרת מקורית: $1]",
+	"newarticles-filter-contentarea": "תחום תוכן ראשי"
 }
