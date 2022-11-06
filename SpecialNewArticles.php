@@ -141,8 +141,8 @@ class NewArticlesPager extends LogPager {
 		}
 
 		$targetName = $paramsSerialized === false ? $paramsOldFormat[0] : $paramsSerialized['4::target'];
-		$logPageId = (int)$row->log_page;
-		$currentTitle = ( $logPageId && $logPageId !== 0 ) ? Title::newFromID( $logPageId ) : null;
+		$logPageId = isset( $row->log_page ) ? (int)$row->log_page : 0;
+		$currentTitle = ( $logPageId !== 0 ) ? Title::newFromID( $logPageId ) : null;
 
 		$targetTitleObj = Title::newFromText( $targetName );
 
