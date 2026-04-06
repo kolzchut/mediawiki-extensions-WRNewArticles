@@ -6,18 +6,18 @@
  * @ingroup Extensions
  */
 
-$specialPageAliases = array();
+$specialPageAliases = [];
 
 /** English
  * @author Dror S. [FFS]
  */
-$specialPageAliases['en'] = array(
-	'NewArticles' => array( 'NewArticles', 'New Articles' ),
-);
+$specialPageAliases['en'] = [
+	'NewArticles' => [ 'NewArticles', 'New Articles' ],
+];
 
 /** Hebrew
  * @author Dror S. [FFS]
  */
-$specialPageAliases['he'] = array(
-	'NewArticles' => array( 'ערכים חדשים' ),
-);
+$specialPageAliases['he'] = [
+	'NewArticles' => [ 'ערכים חדשים' ],
+];

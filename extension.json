@@ -1,0 +1,34 @@
+{
+	"name": "NewArticles",
+	"version": "1.1.0",
+	"author": [
+		"Dror S. [FFS] ([http://www.kolzchut.org.il Kol-Zchut])"
+	],
+	"url": "https://github.com/kolzchut/mediawiki-extensions-WRNewArticles",
+	"descriptionmsg": "newarticles-desc",
+	"license-name": "GPL-2.0-or-later",
+	"type": "specialpage",
+	"requires": {
+		"MediaWiki": ">= 1.35.0"
+	},
+	"AutoloadNamespaces": {
+		"MediaWiki\\Extension\\WRNewArticles\\": "includes/"
+	},
+	"SpecialPages": {
+		"NewArticles": {
+			"class": "MediaWiki\\Extension\\WRNewArticles\\SpecialNewArticles",
+			"services": [
+				"TitleFactory"
+			]
+		}
+	},
+	"MessagesDirs": {
+		"NewArticles": [
+			"i18n"
+		]
+	},
+	"ExtensionMessagesFiles": {
+		"NewArticlesAlias": "NewArticles.alias.php"
+	},
+	"manifest_version": 2
+}
