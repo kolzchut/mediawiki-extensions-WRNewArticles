@@ -17,8 +17,15 @@ use MediaWiki\Title\TitleFactory;
 class NewArticlesPager extends LogPager {
 
 	private TitleFactory $titleFactory;
+
+	/** @var string|null Content area filter value */
 	protected $contentArea;
 
+	/**
+	 * @param IContextSource $context
+	 * @param string|null $contentArea
+	 * @param TitleFactory|null $titleFactory
+	 */
 	public function __construct(
 		IContextSource $context,
 		$contentArea = null,
@@ -40,6 +47,9 @@ class NewArticlesPager extends LogPager {
 		);
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	public function getQueryInfo() {
 		$info = parent::getQueryInfo();
 
@@ -56,6 +66,9 @@ class NewArticlesPager extends LogPager {
 		return $info;
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	public function formatRow( $row ) {
 		$time = htmlspecialchars(
 			$this->getLanguage()->userDate(

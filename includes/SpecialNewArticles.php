@@ -17,6 +17,9 @@ class SpecialNewArticles extends FormSpecialPage {
 		$this->titleFactory = $titleFactory;
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	protected function getGroupName() {
 		return 'changes';
 	}
@@ -38,10 +41,16 @@ class SpecialNewArticles extends FormSpecialPage {
 		}
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	protected function alterForm( HTMLForm $form ) {
 		$form->setMethod( 'get' );
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	protected function getFormFields() {
 		$fields = [];
 		if ( ExtensionRegistry::getInstance()->isLoaded( 'ArticleContentArea' ) ) {
@@ -64,13 +73,17 @@ class SpecialNewArticles extends FormSpecialPage {
 	}
 
 	private static function makeOptionsWithAllForSelect( array $arr ): array {
-		return [ 'הכל' => '' ] + self::makeOptionsForSelect( $arr ); // @todo i18n
+		// @todo i18n
+		return [ 'הכל' => '' ] + self::makeOptionsForSelect( $arr );
 	}
 
 	private static function getContentAreaOptions(): array {
 		return self::makeOptionsWithAllForSelect( ArticleContentArea::getValidContentAreas() );
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	protected function getDisplayFormat() {
 		return 'ooui';
 	}

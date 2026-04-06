@@ -3,5 +3,10 @@
 		"authors": [
 			"Dror S."
 		]
-	}
+	},
+	"newarticles-desc": "Description of the WRNewArticles extension, shown on Special:Version.",
+	"newarticles": "Title of the special page listing new articles.",
+	"newarticles-articletype": "Article type label shown in parentheses next to an article. $1 is the article type name.",
+	"newarticles-original-title": "Label showing the original title of an article before it was renamed. $1 is the original title.",
+	"newarticles-filter-contentarea": "Label for the content area filter on the new articles special page."
 }
