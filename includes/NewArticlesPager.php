@@ -2,6 +2,7 @@
 
 namespace MediaWiki\Extension\WRNewArticles;
 
+use DatabaseLogEntry;
 use ExtensionRegistry;
 use LogEventsList;
 use MediaWiki\Context\IContextSource;
@@ -77,13 +78,11 @@ class NewArticlesPager extends LogPager {
 			)
 		);
 
-		$paramsSerialized = unserialize( $row->log_params );
-		$paramsOldFormat = null;
-		if ( $paramsSerialized === false ) {
-			$paramsOldFormat = explode( "\n", $row->log_params );
-		}
-
-		$targetName = $paramsSerialized === false ? $paramsOldFormat[0] : ( $paramsSerialized['4::target'] ?? null );
+		// Let core tell serialized params from the legacy newline-separated format, as
+		// LogEventsList does: it does so without a PHP warning and with no class instances.
+		$logEntry = DatabaseLogEntry::newFromRow( $row );
+		$params = $logEntry->getParameters();
+		$targetName = $logEntry->isLegacy() ? ( $params[0] ?? null ) : ( $params['4::target'] ?? null );
 		$logPageId = isset( $row->log_page ) ? (int)$row->log_page : 0;
 		$currentTitle = ( $logPageId !== 0 ) ? $this->titleFactory->newFromID( $logPageId ) : null;
 
@@ -107,9 +106,12 @@ class NewArticlesPager extends LogPager {
 			$pageLink = Html::rawElement( 'strong', [], $pageLink );
 		}
 
-		$articleTypeReadable = ArticleType::getReadableArticleTypeFromCode( $row->article_type );
-		$articleTypeDisplay = ' ' . $this->msg( 'newarticles-articletype' )
-			->params( $articleTypeReadable )->text();
+		// article_type is only selected when ArticleType is loaded (see getQueryInfo())
+		if ( ExtensionRegistry::getInstance()->isLoaded( 'ArticleType' ) ) {
+			$articleTypeReadable = ArticleType::getReadableArticleTypeFromCode( $row->article_type ?? null );
+			$articleTypeDisplay = ' ' . $this->msg( 'newarticles-articletype' )
+				->params( $articleTypeReadable )->text();
+		}
 
 		return Html::rawElement(
 			'li',
