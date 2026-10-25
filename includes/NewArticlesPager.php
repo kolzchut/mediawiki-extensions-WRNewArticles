@@ -83,13 +83,15 @@ class NewArticlesPager extends LogPager {
 			$paramsOldFormat = explode( "\n", $row->log_params );
 		}
 
-		$targetName = $paramsSerialized === false ? $paramsOldFormat[0] : $paramsSerialized['4::target'];
+		$targetName = $paramsSerialized === false ? $paramsOldFormat[0] : ( $paramsSerialized['4::target'] ?? null );
 		$logPageId = isset( $row->log_page ) ? (int)$row->log_page : 0;
 		$currentTitle = ( $logPageId !== 0 ) ? $this->titleFactory->newFromID( $logPageId ) : null;
 
-		$targetTitleObj = $this->titleFactory->newFromText( $targetName );
+		// The target may not parse as a title (e.g. it was logged under title rules that
+		// have since changed, or the params lack a target); such a row cannot be linked.
+		$targetTitleObj = is_string( $targetName ) ? $this->titleFactory->newFromText( $targetName ) : null;
 
-		if ( $targetTitleObj->getNamespace() !== NS_MAIN ) {
+		if ( !$targetTitleObj || $targetTitleObj->getNamespace() !== NS_MAIN ) {
 			return false;
 		}
 
